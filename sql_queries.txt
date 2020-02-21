@@ -1,0 +1,266 @@
+﻿
+--1
+COLUMN Skill FORMAT A30
+COLUMN month_passed FORMAT A5
+COLUMN EMPLOYEE FORMAT A25
+COLUMN count FORMAT 999
+
+SELECT emp_num||' '||emp_first||' '||emp_last EMPLOYEE, NVL(TO_CHAR(Description),'-') Skill,
+       Count(Train_Num) count, NVL(TO_CHAR(Max( Date_Acquired )),'-') recent_date,
+       NVL(TO_CHAR(TRUNC(MONTHS_BETWEEN(SYSDATE,Max( Date_Acquired )))),'-') month_passed
+FROM Employee
+     LEFT JOIN training USING(Emp_Num)
+     LEFT JOIN Skill USING (Code)
+GROUP BY Emp_Num, emp_first, emp_last, Description
+order by emp_num
+/
+
+
+--2
+column EMPLOYEE_HIERARCHY format a30
+column DEPARTMENT format a25
+
+select level, LPAD(' ',2*(LEVEL-1))||emp_num||' '||emp_first||' '||emp_last "EMPLOYEE_HIERARCHY",
+       dept_code||' '||name "DEPARTMENT"
+from   employee join department using(dept_code)
+start with emp_num = 
+           (select emp_num from employee where super_id is null)
+connect by prior emp_num = super_id
+/
+
+
+--3
+COLUMN START_DATE FORMAT A10
+COLUMN MONTH_ASSIGNED FORMAT A10
+
+select * 
+from
+(select name, to_char(start_date) "START_DATE",
+        to_char(extract(year from date_assigned)) || '-' || to_char(extract(month from date_assigned))  "MONTH_ASSIGNED",
+        count(emp_num) "NUM_EMPLOYEE",
+        NVL(sum(hours_used),0) "TOTAL_HOURS"
+        from    project join assignment using (proj_number)
+        where   total_cost is null
+        group   by extract(month from date_assigned),extract(year from date_assigned),name, start_date
+        order   by extract(year from date_assigned) desc, extract(month from date_assigned) desc)
+union   all
+select  'Grand total:', '--------',
+    	'--------',
+    	count(emp_num), sum(NVL(hours_used,0))
+from    project join assignment using (proj_number)
+where   total_cost is null
+/
+
+
+--4
+column emp_num format 999999
+ALTER TABLE employee DROP COLUMN BONUS_AMT;
+ALTER TABLE employee ADD BONUS_AMT NUMBER(4) DEFAULT 0;
+
+MERGE INTO employee j
+USING 
+    (SELECT Emp_Num, SUM(bonus) BONUS_AMT
+     FROM
+	(SELECT Emp_Num, Proj_Number, EXTRACT(YEAR FROM Start_Date) start_year, SUM(Hours_Used), 
+	 CASE WHEN SUM(Hours_Used)>=40 THEN 200 ELSE 0 END bonus
+	 FROM assignment JOIN project USING(Proj_Number)
+	 WHERE EXTRACT(YEAR FROM Start_Date) = EXTRACT(YEAR FROM SYSDATE) - 1
+	 GROUP BY Emp_Num, Proj_Number, Start_Date)
+      GROUP BY Emp_Num) h
+ON (j.Emp_Num = h.Emp_Num)
+WHEN MATCHED THEN
+  UPDATE
+     SET j.BONUS_AMT = h.BONUS_AMT
+/
+COMMIT
+/
+SELECT * FROM Employee
+/
+
+
+--5
+column date_training format A10
+column days_from_hire format A5
+column training format A20
+
+select  emp_num||' '||emp_first||' '||emp_last EMPLOYEE, hire_date,
+	NVL(name, '-') "TRAINING",
+	NVL(to_char(date_acquired),'-') "DATE_TRAINING",
+	NVL(to_char(trunc(date_acquired-hire_date)),'-') "DAYS_FROM_HIRE",
+	"NUM_PROJECTS"
+from    employee left join training using(emp_num)
+	              join (select emp_num, count(distinct proj_number) "NUM_PROJECTS"
+                            from project join assignment using(proj_number)
+                            group by emp_num) using (emp_num)
+where   extract (year from hire_date) = extract(year from sysdate)-1
+/
+
+
+--6
+SELECT Proj_Number, Name, Start_Date,
+       CASE WHEN Total_Cost IS NULL THEN 'on-going' ELSE 'completed' END status
+FROM Assignment JOIN project USING (Proj_Number)
+GROUP BY Proj_Number, Name, Start_Date,Total_Cost
+HAVING CEIL(MONTHS_BETWEEN(MAX(Date_Assigned),MIN(Date_Assigned)))+1 <> COUNT(DISTINCT EXTRACT(MONTH from Date_Assigned))
+/
+
+
+--7
+column quarter format A3
+column avg_hour format A5
+
+select  'Q' || quarter QUARTER,
+        count(distinct proj_number) "NUM_PROJECT",
+        count(distinct emp_num) "NUM_EMP",
+        NVL(to_char(sum(hours_used)/count(distinct proj_number)),'0') "AVG_HOUR"
+from      (select to_char(level) QUARTER from dual
+           connect by level<= 4)
+        left outer join 
+          (select to_char(start_date, 'Q') QUARTER, 
+           proj_number, emp_num, hours_used
+           from project join assignment using (proj_number)
+           where extract(year from start_date) = extract(year from sysdate))
+        using (QUARTER)        
+group   by QUARTER
+order   by quarter
+/
+
+
+--8
+COLUMN Emp_Num FORMAT A10
+COLUMN Emp_Name FORMAT A30
+COLUMN latest_date FORMAT A10
+COLUMN "Management" FORMAT A2
+COLUMN "Speaking" FORMAT A2
+COLUMN "Listening" FORMAT A2
+COLUMN "Writing" FORMAT A2
+COLUMN "Coding" FORMAT A2
+COLUMN "Creativity" FORMAT A2
+COLUMN "Number of Skills:" FORMAT A18
+
+SELECT  DECODE(Emp_Num, NULL, '-', TO_CHAR(Emp_Num)) Emp_Num,
+        DECODE(Emp_Name, NULL, 'Number of Trainings:', Emp_Name) Emp_Name,
+        TO_CHAR(SUM(DECODE(Code,100601,count,0))) "Management", 
+	DECODE(Emp_Num, NULL, '------', NVL(TO_CHAR(MAX(DECODE(Code,100601,latest_date,null))),'------')) latest_date,
+        TO_CHAR(SUM(DECODE(Code,239271,count,0))) "Speaking", 
+	DECODE(Emp_Num, NULL, '------', NVL(TO_CHAR(MAX(DECODE(Code,239271,latest_date,null))),'------')) latest_date,
+        TO_CHAR(SUM(DECODE(Code,891152,count,0))) "Listening", 
+	DECODE(Emp_Num, NULL, '------', NVL(TO_CHAR(MAX(DECODE(Code,891152,latest_date,null))),'------')) latest_date,
+        TO_CHAR(SUM(DECODE(Code,834721,count,0))) "Writing", 
+	DECODE(Emp_Num, NULL, '------', NVL(TO_CHAR(MAX(DECODE(Code,834721,latest_date,null))),'------')) latest_date,
+        TO_CHAR(SUM(DECODE(Code,901374,count,0))) "Coding", 
+	DECODE(Emp_Num, NULL, '------', NVL(TO_CHAR(MAX(DECODE(Code,901374,latest_date,null))),'------')) latest_date,
+        TO_CHAR(SUM(DECODE(Code,834580,count,0))) "Creativity", 
+	DECODE(Emp_Num, NULL, '------', NVL(TO_CHAR(MAX(DECODE(Code,834580,latest_date,null))),'------')) latest_date,
+        DECODE(Emp_Num, NULL, '------',COUNT(DISTINCT Code)) "Number of Skills:"
+FROM (SELECT Emp_Num, Emp_First || ' ' || Emp_Last AS Emp_Name,
+             Code, Description, COUNT(Emp_Num) count, MAX(Date_Acquired) latest_date
+      FROM Employee left JOIN Training USING (Emp_Num)
+                    left JOIN Skill USING (Code)
+      GROUP BY Emp_Num, Emp_First, Emp_Last, Code, Description)
+GROUP BY GROUPING SETS ((Emp_Num,Emp_Name),())
+/
+
+
+--9
+column description format A30
+
+select  DEPT_NAME, description, count(train_num) num_train,
+        rank() over
+        (partition by dept_code order by count(train_num) desc)
+        as RANK
+from    (select distinct dept_code, name "DEPT_NAME", code, description 
+ 	 from department cross join skill) 
+ 	                  left join employee using(dept_code)
+ 			  left join training using(code,emp_num)     
+group   by DEPT_code, DEPT_NAME, code, description 
+/
+
+
+--10
+COLUMN Emp_Num FORMAT A6
+COLUMN Emp_Info FORMAT A30
+COLUMN Sup_Info FORMAT A30
+COLUMN Description FORMAT A30
+COLUMN month_after FORMAT A3
+COLUMN count FORMAT A3
+
+SELECT Emp_Info, Sup_Info, NVL(Training.Name,'-') training_name, NVL(TO_CHAR(Date_Acquired),'-') Date_Acquired,
+       NVL(Description,'-') Description, 
+       NVL(TO_CHAR(TRUNC(MONTHS_BETWEEN(SYSDATE, Date_Acquired))),'-') month_after, NVL(TO_CHAR(count),'0') count
+FROM
+   (SELECT e.Emp_Num Emp_Num,
+           e.Emp_Num || ': ' || e.Emp_First || ' ' || e.Emp_Last Emp_Info,
+           DECODE(e.Super_ID, NULL, '-', e.Super_ID || ': ' || s.Emp_First || ' ' || s.Emp_Last) Sup_Info
+    FROM Employee e LEFT OUTER JOIN Employee s ON e.Super_ID = s.Emp_Num
+    ORDER BY e.Emp_Num)
+LEFT OUTER JOIN Training USING(Emp_Num)
+LEFT OUTER JOIN Skill USING(Code)
+LEFT OUTER JOIN (SELECT Emp_Num, COUNT(Train_Num) count FROM Training GROUP BY Emp_Num) USING(Emp_Num)
+/
+
+
+--11
+--because when the employee’s hiredate is missing, 
+--we cannot compute the available working hours which is the denominator,
+--so we ignore the employees whose hiredate is missing in this question. 
+drop sequence bonus_seq
+/
+create sequence bonus_seq
+increment by -1000
+start with 10000
+maxvalue 10000
+minvalue 6000
+cycle
+nocache
+/
+select employee, utilization, bonus_seq.nextval "AWARD/BONUS"
+from   (select  Emp_Num || ' ' || emp_first||' '||emp_last EMPLOYEE,
+                to_char(NVL(sum(hours_used), 0)/trunc((sysdate-hire_date)/7)/40*100, '990.999') || '%'
+                    as "UTILIZATION"
+        from    employee
+                       left outer join assignment using(emp_num)
+        where   trunc((sysdate-hire_date)/7)<>0
+        group   by emp_num, emp_first, emp_last, hire_date, rownum
+        order   by UTILIZATION desc
+        fetch   first 5 rows only)
+/
+
+
+--12
+COLUMN "Table Name" FORMAT A15
+COLUMN "Column Name" FORMAT A15
+COLUMN CONSTRAINT_NAME FORMAT A30
+COLUMN SEARCH_CONDITION_VC FORMAT A50
+COLUMN FK_table_name FORMAT A10
+COLUMN FK_column_name FORMAT A15
+BREAK ON "Table Name" ON "Column Name"
+
+SELECT a.table_name "Table Name", a.column_name "Column Name", NVL(c.constraint_name,'-') constraint_name,
+       NVL((CASE WHEN c.constraint_type = 'P' THEN 'PK'
+                 WHEN c.constraint_type = 'C' AND SUBSTR(c.constraint_name,-2,2) = 'NN' THEN 'NN'
+                 WHEN c.constraint_type = 'C' AND SUBSTR(c.constraint_name,-2,2) <> 'NN' THEN 'CK'
+                 WHEN c.constraint_type = 'R' THEN 'FK' END),'-') constraint_type,
+       NVL(c.search_condition_vc,'-') search_condition_vc,
+       NVL(d.table_name,'-') FK_table_name, NVL(d.column_name,'-') FK_column_name
+FROM
+   (SELECT ROWNUM row_ID, table_name, column_name
+    FROM   user_tab_columns
+    WHERE LOWER(table_name) IN (select distinct lower(table_name) from user_tab_columns)) a
+LEFT OUTER JOIN
+   (SELECT table_name, column_name, constraint_name
+    FROM   USER_CONS_COLUMNS
+    WHERE LOWER(table_name) IN (select distinct lower(table_name) from user_tab_columns)) b
+ON a.table_name = b.table_name AND a.column_name = b.column_name
+LEFT OUTER JOIN
+   (SELECT table_name, constraint_name, constraint_type, search_condition_vc, r_constraint_name
+    FROM   user_constraints
+    WHERE LOWER(table_name) IN (select distinct lower(table_name) from user_tab_columns)) c
+ON b.table_name = c.table_name AND b.CONSTRAINT_NAME = c.CONSTRAINT_NAME
+LEFT OUTER JOIN
+   (SELECT table_name, column_name, constraint_name
+    FROM   USER_CONS_COLUMNS
+    WHERE LOWER(table_name) IN (select distinct lower(table_name) from user_tab_columns)) d
+ON c.r_constraint_name = d.constraint_name
+ORDER BY a.table_name, a.row_ID
+/

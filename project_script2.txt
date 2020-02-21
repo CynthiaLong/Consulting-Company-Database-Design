@@ -1,0 +1,134 @@
+-- department -- 
+
+INSERT INTO department VALUES (101,'Management','San Jose', '132-134-5214',100001);
+INSERT INTO department VALUES (102,'IT','New York', '735-878-4663',100004);
+INSERT INTO department VALUES (103,'Human Resources','New York', '458-513-3924',100005);
+INSERT INTO department VALUES (104,'Production','Pittsburgh', '412-134-5214',100007);
+INSERT INTO department VALUES (105,'Purchasing','New York', '394-825-8304',100008);
+INSERT INTO department VALUES (106,'Sales and marketing','New York', '716-404-3918',100010);
+INSERT INTO department VALUES (107,'R\D','San Jose', '799-412-2656',100015);
+
+
+-- employee -- 
+
+INSERT INTO employee  (Emp_Num, Emp_Last, Emp_First, DOB, hire_date, Dept_Code)
+            VALUES (100001,'Speedwagon', 'Mario', '05-JAN-1970', '11-JUN-2001', 101);
+INSERT INTO employee VALUES (100002,'Cruiser','Petey','06-March-1970', '10-Sep-2018', 100001,102);
+INSERT INTO employee VALUES (100003,'Sthesia','Anna', '23-Oct-1966', '14-Aug-2002', 100002,102);
+INSERT INTO employee VALUES (100004,'Molive','Paul', '25-May-1974', '01-Jan-2010', 100002,102);
+INSERT INTO employee VALUES (100005,'Mull','Anna', '22-Feb-1969', '12-Feb-2002', 100001,103);
+INSERT INTO employee VALUES (100006,'Forcewind','Gail', '27-Jul-1976', '06-Feb-2003', 100005,103);
+INSERT INTO employee (Emp_Num, Emp_Last, Emp_First, DOB, Super_ID, Dept_Code)
+            VALUES (100007,'Turner','Paige', '27-Nov-1979', 100001, 104);
+INSERT INTO employee VALUES (100008,'Frapples','Bob','01-Aug-1981', '14-May-2004',100001,105);
+INSERT INTO employee VALUES (100009,'Melon','Walter','13-Apr-1982', '14-Jan-2005', 100008,105);
+INSERT INTO employee VALUES (100010,'Ackue','Barb','09-Jul-1970', '19-Mar-2007',100001,106);
+INSERT INTO employee VALUES (100011,'Kinnear','Buck','24-Jan-1983', '25-Oct-2007', 100010,106);
+INSERT INTO employee VALUES (100012,'Life','Greta','12-Jul-1977', '10-Dec-2007', 100010,106);
+INSERT INTO employee VALUES (100013,'Membrit','Ira','20-Mar-1983', '31-Dec-2007',100012,106);
+INSERT INTO employee VALUES (100014,'Leer','Shonda','12-Apr-1983', '20-Aug-2008', 100012,106);
+INSERT INTO employee VALUES (100015,'Lee','Brock','23-Sep-1995', '23-Jan-2009', 100001,107);
+INSERT INTO employee VALUES (100016,'Didas','Maya','07-Aug-1987', '21-Jan-2009',100015,107);
+INSERT INTO employee VALUES (100017,'Sariya','Pete','18-Nov-1984', '17-Feb-2009', 100015,107);
+INSERT INTO employee VALUES (100018,'Carlo','Monty','06-Jul-1978', '28-Jul-2009',100016,107);
+INSERT INTO employee VALUES (100019,'Monella','Sal','30-Sep-1988', '04-Aug-2010', 100016,107);
+INSERT INTO employee VALUES (100020,'Hanger','Cliff','07-Sep-1988', '11-Oct-2010', 100017,107);
+
+
+
+-- skill --
+
+INSERT INTO Skill VALUES (100601,'Management');
+INSERT INTO Skill VALUES (239271,'Speaking');
+INSERT INTO Skill VALUES (891152,'Listening');
+INSERT INTO Skill VALUES (834721,'Writing');
+INSERT INTO Skill VALUES (901374,'Coding');
+INSERT INTO Skill VALUES (834580,'Creativity');
+
+-- training --
+
+INSERT INTO Training VALUES (100000001,100601,100001,'30-Jun-2018','Organizational Design','COMPLETED');
+INSERT INTO Training VALUES (100000002,100601,100006,'01-Dec-2017','Organizational Design','COMPLETED');
+INSERT INTO Training VALUES (100000003,239271,100011,'25-Mar-2019','Public speaking','COMPLETED');
+INSERT INTO Training VALUES (100000004,834721,100011,'30-Jun-2018','Business Writing','COMPLETED');
+INSERT INTO Training VALUES (100000005,834721,100001,'13-May-2017','Business Writing','COMPLETED');
+INSERT INTO Training VALUES (100000006,901374,100015,'30-Jun-2018','OOP in JAVA','COMPLETED');
+INSERT INTO Training VALUES (100000007,901374,100011,'24-Sep-2014','OOP in JAVA','COMPLETED');
+INSERT INTO Training VALUES (100000008,901374,100006,'26-Feb-2018','OOP in JAVA','COMPLETED');
+INSERT INTO Training VALUES (100000009,901374,100019,'01-Jan-2019','Data Focused Python','COMPLETED');
+INSERT INTO Training VALUES (100000010,834580,100020,'15-Oct-2019','Creative Writing','COMPLETED');
+INSERT INTO Training VALUES (100000011,901374,100006,'01-Dec-2018','R Language','COMPLETED');
+INSERT INTO Training VALUES (100000012,834721,100001,'16-Dec-2018','Business Proposal','COMPLETED');
+INSERT INTO Training VALUES (100000013,901374,100006,'26-Feb-2019','OOP in JAVA','COMPLETED');
+INSERT INTO Training VALUES (100000014,901374,100019,'01-Jan-2019','R Language','COMPLETED');
+INSERT INTO Training VALUES (100000015,834721,100002,'16-Dec-2018','Business Proposal','COMPLETED');
+INSERT INTO Training VALUES (100000016,901374,100002,'26-Feb-2019','OOP in JAVA','COMPLETED');
+INSERT INTO Training VALUES (100000017,901374,100002,'01-Jan-2019','R Language','COMPLETED');
+
+-- client --
+
+INSERT INTO client VALUES ('50001', 'Brain_Company', '1 University Rd', 'Boston', 'MA' ,'02215','Mngt','www.brain.com', '412-121-4126','Morris');
+INSERT INTO client VALUES ('50002', 'Room_Video', '302 S Market St', 'San Jose', 'CA', '95113','IT Services','www.room.com', '412-121-5689','Eric');
+INSERT INTO client VALUES ('50003', 'IO Burger', '15215 Barranca Pkwy #1', 'Irvine', 'CA', '92618','Fast-Food','www.ioburger.com', '412-121-1487','lynsi');
+INSERT INTO client VALUES ('50004', 'Procure Tech', '4160 Via Real', 'Carpinteria', 'CA', '93013','Computer Hardware','www.procure.com', '412-121-3337','Craig');
+INSERT INTO client VALUES ('50005', 'Houston Consulting', '8801 Airline Dr', 'Houston', 'TX', '77037','Consulting','www.houstonconsulting.com', '412-121-1347','Rich');
+INSERT INTO client VALUES ('50006', 'Line','905 E El Camino Real', 'Sunnyvale', 'CA', '94087','Internet','www.line.com', '412-121-5556','Jeff');
+INSERT INTO client VALUES ('50007', 'facebowl','100 El Camino Real', 'Menlo Park', 'CA', '94025','Internet','www.facebowl.com', '412-121-8009','Mike');
+INSERT INTO client VALUES ('50008', 'alpha','585 Franklin St', 'Mountain View', 'CA', '94041','Internet','www.alpha.com', '412-121-2345','Sundar');
+INSERT INTO client VALUES ('50009', 'lulu','4200 Genesee St', 'Buffalo', 'NY', '14225','Clothing, Shoe Stores','www.lulu.com', '412-121-9931','Calvin');
+INSERT INTO client VALUES ('50010', 'Sunrise Airlines','2943 SMU Boulevard', 'Dallas', 'TX', '75205','Airlines','www.sunrise.com', '412-121-8238','Gary');
+
+
+-- project --
+
+INSERT INTO project VALUES (7000001, 'jaguar', '22-NOV-18', 8976200.50, 101, 50001);
+INSERT INTO project VALUES (7000002, 'meerkat', '10-JUL-17', 17896.66, 104, 50002);
+INSERT INTO project VALUES (7000003, 'penguin', '12-AUG-19', NULL, 105, 50003);
+INSERT INTO project VALUES (7000004, 'wallaby', '18-MAY-17', 79645230.00, 106, 50004);
+INSERT INTO project VALUES (7000005, 'malamute', '05-MAR-15', 628292.80,107, 50005);
+INSERT INTO project VALUES (7000006, 'seahorse', '03-JAN-18', 3614975.33, 102, 50006);
+INSERT INTO project VALUES (7000007, 'parrot', '13-JAN-17', 1480584.00, 107, 50005);
+INSERT INTO project VALUES (7000008, 'hippo', '27-APR-15', 732828.42, 107, 50004);
+INSERT INTO project VALUES (7000009, 'rabbit', '09-JUN-16', 6803023.00, 101, 50003);
+INSERT INTO project VALUES (7000010, 'siamese', '10-NOV-14', 772800.00, 102, 50002);
+INSERT INTO project VALUES (7000011, 'peccary', '15-AUG-16', 22334470.00, 104, 50001);
+INSERT INTO project VALUES (7000012, 'crogi', '25-FEB-19', 1110172.00, 105, 50006);
+
+
+-- assignment -- 
+--only project 7000003 is still in progress
+--only project 7000007 has employees coming from different depts
+--discontinued projects: 7000003(on going), 7000004(completed)
+INSERT INTO assignment VALUES (80000001, 7000001, 100002, '23-NOV-18', '30-NOV-18', 50);
+INSERT INTO assignment VALUES (80000002, 7000001, 100002, '03-DEC-18', '28-DEC-18', 160);
+INSERT INTO assignment VALUES (80000003, 7000002, 100007, '10-JUL-17', '28-JUL-17', 120);
+INSERT INTO assignment VALUES (80000004, 7000003, 100008, '12-AUG-19', '30-AUG-19', 120);
+INSERT INTO assignment VALUES (80000005, 7000003, 100008, '01-OCT-19', '31-OCT-19', 184);
+INSERT INTO assignment VALUES (80000006, 7000003, 100009, '01-NOV-19', NULL, NULL);
+INSERT INTO assignment VALUES (80000007, 7000004, 100010, '18-MAY-17', '31-MAY-17', 80);
+INSERT INTO assignment VALUES (80000008, 7000005, 100012, '05-MAR-15', '27-MAR-15', 136);
+INSERT INTO assignment VALUES (80000009, 7000006, 100004, '03-JAN-18', '16-JAN-18', 80);
+INSERT INTO assignment VALUES (80000010, 7000007, 100018, '16-JAN-17', '27-JAN-17', 100);
+INSERT INTO assignment VALUES (80000011, 7000007, 100012, '01-FEB-17', '24-FEB-17', 144);
+INSERT INTO assignment VALUES (80000012, 7000008, 100020, '27-APR-15', '30-APR-15', 32);
+INSERT INTO assignment VALUES (80000013, 7000008, 100020, '01-MAY-15', '29-MAY-15', 168);
+INSERT INTO assignment VALUES (80000014, 7000009, 100001, '09-JUN-16', '29-JUN-16', 120);
+INSERT INTO assignment VALUES (80000015, 7000010, 100004, '10-NOV-14', '21-NOV-14', 80);
+INSERT INTO assignment VALUES (80000016, 7000010, 100004, '01-DEC-14', '19-DEC-14', 120);
+INSERT INTO assignment VALUES (80000017, 7000011, 100007, '15-AUG-16', '31-AUG-16', 104);
+INSERT INTO assignment VALUES (80000018, 7000012, 100008, '25-FEB-19', '28-FEB-19', 35);
+INSERT INTO assignment VALUES (80000019, 7000012, 100009, '01-MAR-19', '22-MAR-19', 128);
+INSERT INTO assignment VALUES (80000020, 7000003, 100007, '01-OCT-19', '31-OCT-19', 160);
+INSERT INTO assignment VALUES (80000021, 7000003, 100009, '01-OCT-19', '31-OCT-19', 100);
+INSERT INTO assignment VALUES (80000022, 7000004, 100010, '03-JUL-17', '27-JUL-17', 152);
+
+
+ALTER TABLE Department
+ADD CONSTRAINT Department_ManagerID_FK   
+    FOREIGN KEY (Manager_ID)  
+	REFERENCES Employee (Emp_Num);
+
+
+
+
+

@@ -1,0 +1,94 @@
+set echo on 
+set linesize 200
+set pagesize 255
+-- drop existed tables --
+DROP TABLE Skill		CASCADE CONSTRAINTS;
+DROP TABLE Training		CASCADE CONSTRAINTS;
+DROP TABLE Department	CASCADE CONSTRAINTS;
+DROP TABLE Employee		CASCADE CONSTRAINTS;
+DROP TABLE Client		CASCADE CONSTRAINTS;
+DROP TABLE Project		CASCADE CONSTRAINTS;
+DROP TABLE Assignment	CASCADE CONSTRAINTS;
+
+-- create tables --
+CREATE TABLE Department
+(Dept_Code       Number(3),
+ Name            Varchar2(25),
+ Location        Varchar2(50),
+ Phone           Char(12),
+ Manager_ID      Number(6)    CONSTRAINT Department_ManagerID_NN NOT NULL,
+ CONSTRAINT Department_DeptCode_PK      PRIMARY KEY (Dept_Code),
+ CONSTRAINT Department_Phone_CK       CHECK (REGEXP_LIKE(Phone,'^[0-9]{3}-[0-9]{3}-[0-9]{4}$')));
+
+CREATE TABLE Employee
+(Emp_Num    Number(6),
+ Emp_Last   Varchar2(25),
+ Emp_First  Varchar2(25),
+ DOB        Date,
+ Hire_Date  Date DEFAULT SYSDATE, 
+ Super_ID   Number(6), 
+ Dept_Code  Number(3) CONSTRAINT Employee_DeptCode_NN NOT NULL,
+ CONSTRAINT Employee_EmpNum_PK  PRIMARY KEY (Emp_Num),
+ CONSTRAINT Employee_DeptCode_FK FOREIGN KEY (Dept_Code) REFERENCES Department (Dept_Code),
+ CONSTRAINT Employee_SuperID_FK  FOREIGN KEY (Super_ID) REFERENCES Employee (Emp_Num),
+ CONSTRAINT Employee_DOB_CK       CHECK (DOB <= Hire_Date),
+ CONSTRAINT Employee_EmpLast_CK   CHECK (REGEXP_LIKE(Emp_Last,'^[A-Za-z'' ]{1,}$')),
+ CONSTRAINT Employee_EmpFirst_CK  CHECK (REGEXP_LIKE(Emp_First,'^[A-Za-z'' ]{1,}$')));
+
+
+CREATE TABLE Skill
+(Code            Number(6),
+ Description     Varchar2(150),
+ CONSTRAINT Skill_Code_PK PRIMARY KEY (Code));
+ 
+CREATE TABLE Training
+(Train_Num         Number(9),
+ Code              Number(6) CONSTRAINT Training_Code_NN NOT NULL,
+ Emp_Num           Number(6) CONSTRAINT Training_EmpNum_NN NOT NULL,
+ Date_Acquired     Date,
+ Name              Varchar2(25),
+ Comments          Varchar2(150),
+ CONSTRAINT Training_TrainNum_PK PRIMARY KEY (Train_Num),
+ CONSTRAINT Training_Code_FK     FOREIGN KEY (Code)     REFERENCES Skill (Code),
+ CONSTRAINT Training_EmpNum_FK   FOREIGN KEY (Emp_Num)  REFERENCES Employee (Emp_Num));
+
+ 
+
+CREATE TABLE Client
+(Client_ID     Number(5),
+ Name          Varchar2(25),
+ Street        Varchar2(25),
+ city          Varchar2(25),
+ State         Char(2),
+ Zip_Code      Char(5),
+ Industry      Varchar2(25), 
+ Web_Address   Varchar2(150),  
+ Phone         Char(12),
+ Contact_Name  Varchar2(25),
+ CONSTRAINT Client_ClientID_PK  PRIMARY KEY (Client_ID),
+ CONSTRAINT Client_State_CK     CHECK (REGEXP_LIKE(State,'^[A-Z]{2}$')),
+ CONSTRAINT Client_ZipCode_CK   CHECK (REGEXP_LIKE(Zip_code,'^[0-9]{5}$')),
+ CONSTRAINT Client_Phone_CK     CHECK (REGEXP_LIKE(Phone,'^[0-9]{3}-[0-9]{3}-[0-9]{4}$')));
+
+CREATE TABLE Project
+(Proj_Number   Number(7),
+ Name          Varchar2(25),
+ Start_Date    Date DEFAULT SYSDATE,
+ Total_Cost    Number(10,2),
+ Dept_Code     Number(3) CONSTRAINT Project_DeptCode_NN NOT NULL,
+ Client_ID     Number(5) CONSTRAINT Project_ClientID_NN NOT NULL,
+ CONSTRAINT Project_ProjNumber_PK  PRIMARY KEY (Proj_Number),
+ CONSTRAINT Project_DeptCode_FK    FOREIGN KEY (Dept_Code) REFERENCES Department (Dept_Code),
+ CONSTRAINT Project_ClientID_FK    FOREIGN KEY (Client_ID) REFERENCES Client (Client_ID));
+ 
+CREATE TABLE Assignment
+(Assign_Num    Number(8),
+ Proj_Number   Number(7) CONSTRAINT Assignment_ProjNumber_NN NOT NULL,
+ Emp_Num       Number(6) CONSTRAINT Assignment_EmpNum_NN NOT NULL,
+ Date_Assigned Date DEFAULT SYSDATE,
+ Date_Ended    Date,
+ Hours_Used    Number(3),
+ CONSTRAINT Assignment_AssignNum_PK     PRIMARY KEY (Assign_Num),
+ CONSTRAINT Assignment_ProjNumber_FK    FOREIGN KEY (Proj_Number) REFERENCES Project (Proj_Number),
+ CONSTRAINT Assignment_EmpNum_FK        FOREIGN KEY (Emp_Num) REFERENCES Employee (Emp_Num),
+ CONSTRAINT Assignment_DateEnded_CK     CHECK (Date_Ended IS NULL OR Date_Ended >= Date_Assigned));
